@@ -6,8 +6,8 @@ import localForage from 'localforage'
 const db = localForage.createInstance({ driver: localForage.INDEXEDDB, name: 'postcast' })
 
 function App() {
-  const [file, setFile] = useState()
-  const [audio, setAudio] = useState()
+  const [file, setFile] = useState<File>()
+  const [audio, setAudio] = useState<string>()
 
   useEffect(() => {
     if (file) db.setItem('file', file)
@@ -15,22 +15,22 @@ function App() {
 
   useEffect(() => {
     async function load() {
-      const a = await db.getItem('file');
+      const a = await db.getItem<Blob>('file');
 
       if (a) {
         setAudio(URL.createObjectURL(a))
-      };
+      }
     }
 
     load()
   }, [])
 
-  console.log(audio)
-
   return (
     <>
       <div>
-        <input type='file' onChange={(e) => setFile(e.target.files[0])} />
+        <input type='file' onChange={(e) => {
+          if (e && e.target && e.target.files) setFile(e.target.files[0])
+        }} />
         <audio controls src={audio}></audio>
       </div>
     </>
